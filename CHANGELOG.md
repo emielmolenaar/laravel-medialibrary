@@ -2,7 +2,34 @@
 
 All notable changes to `laravel-medialibrary` will be documented in this file
 
+## 5.5.2 - 2017-03-08
+
+- prevent migration from being published multiple times
+- `LocalUrlGenerator` will now use the `url` property of `disk` when one has been set
+
+## 5.5.1 - 2017-03-08
+
+- fix for using `MediaRepository` with a custom media model
+
+## 5.5.0 - 2017-03-08
+
+- add `createMultipleFromRequest` and `createAllFromRequest` on `FileAdder`
+
+## 5.4.0 - 2017-03-08
+
+- add `temporary_directory_path` to config
+
+## 5.3.3 - 2017-03-06
+
+- fix bug around `getRemoteHeadersForFile()`
+
+## 5.3.2 - 2017-03-01
+
+- fix for undefined function `getPath` when using S3
+
 ## 5.3.1 - 2017-03-01
+
+**this version is broken, do not use**
 
 - fix for undefined function `getPath` when using S3
 

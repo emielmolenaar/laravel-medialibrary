@@ -15,11 +15,7 @@ class LocalUrlGenerator extends BaseUrlGenerator
      */
     public function getUrl(): string
     {
-        if (! starts_with($this->getStoragePath(), public_path())) {
-            throw UrlCannotBeDetermined::mediaNotPubliclyAvailable($this->getStoragePath(), public_path());
-        }
-
-        $url = $this->getBaseMediaDirectory().'/'.$this->getPathRelativeToRoot();
+        $url = $this->getBaseMediaDirectoryUrl().'/'.$this->getPathRelativeToRoot();
 
         $url = $this->makeCompatibleForNonUnixHosts($url);
 
@@ -34,6 +30,19 @@ class LocalUrlGenerator extends BaseUrlGenerator
     public function getPath(): string
     {
         return $this->getStoragePath().'/'.$this->getPathRelativeToRoot();
+    }
+
+    protected function getBaseMediaDirectoryUrl(): string
+    {
+        if ($diskUrl = $this->config->get("filesystems.disks.{$this->media->disk}.url")) {
+            return str_replace(url('/'), '', $diskUrl);
+        }
+
+        if (! starts_with($this->getStoragePath(), public_path())) {
+            throw UrlCannotBeDetermined::mediaNotPubliclyAvailable($this->getStoragePath(), public_path());
+        }
+
+        return $this->getBaseMediaDirectory();
     }
 
     /*

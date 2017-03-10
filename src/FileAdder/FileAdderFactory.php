@@ -2,13 +2,14 @@
 
 namespace Spatie\MediaLibrary\FileAdder;
 
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\Exceptions\FileCannotBeAdded\RequestDoesNotHaveFile;
 
 class FileAdderFactory
 {
     /**
-     * @param \Illuminate\Database\Eloquent\Model                        $subject
+     * @param \Illuminate\Database\Eloquent\Model $subject
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
      * @return \Spatie\MediaLibrary\FileAdder\FileAdder
@@ -20,20 +21,26 @@ class FileAdderFactory
             ->setFile($file);
     }
 
-    /**
-     * @param \Illuminate\Database\Eloquent\Model $subject
-     * @param string                              $key
-     *
-     * @return \Spatie\MediaLibrary\FileAdder\FileAdder
-     *
-     * @throws \Spatie\MediaLibrary\Exceptions\FileCannotBeAdded
-     */
-    public static function createFromRequest(Model $subject, string $key)
+    public static function createFromRequest(Model $subject, string $key): FileAdder
     {
-        if (! request()->hasFile($key)) {
-            throw RequestDoesNotHaveFile::create($key);
-        }
+        return static::createMultipleFromRequest($subject, [$key])->first();
+    }
 
-        return static::create($subject, request()->file($key));
+    public static function createMultipleFromRequest(Model $subject, array $keys = []): Collection
+    {
+        return collect($keys)->map(function (string $key) use ($subject) {
+            if (! request()->hasFile($key)) {
+                throw RequestDoesNotHaveFile::create($key);
+            }
+
+            return static::create($subject, request()->file($key));
+        });
+    }
+
+    public static function createAllFromRequest(Model $subject): Collection
+    {
+        $fileKeys = array_keys(request()->allFiles());
+
+        return static::createMultipleFromRequest($subject, $fileKeys);
     }
 }

@@ -55,7 +55,7 @@ class FileManipulator
             return;
         }
 
-        $temporaryDirectory = new TemporaryDirectory(storage_path('medialibrary/temp'));
+        $temporaryDirectory = new TemporaryDirectory($this->getTemporaryDirectoryPath());
 
         $copiedOriginalFile = app(Filesystem::class)->copyFromMediaLibrary(
             $media,
@@ -107,6 +107,15 @@ class FileManipulator
         }
 
         app(Dispatcher::class)->dispatch($job);
+    }
+
+    protected function getTemporaryDirectoryPath(): string
+    {
+        $path = is_null(config('medialibrary.temporary_directory_path'))
+            ? storage_path('medialibrary/temp')
+            : config('medialibrary.temporary_directory_path');
+
+        return $path.str_random(32);
     }
 
     /**
